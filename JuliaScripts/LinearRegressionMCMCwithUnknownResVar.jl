@@ -20,7 +20,7 @@ b=res[3];
 # Now do the analysis using MCMC
 
 # Provide all the parameters with starting values
-niter=10000;                       # define the length of the Markov chain
+niter=100000;                       # define the length of the Markov chain
 numParms=size(X,2);                # Find out how many parameters need sampling
 allSamples=zeros(niter,numParms+1);# Reserve space for storing the samples
 thisSample=zeros(numParms);        # Set initial samples to plausible values
@@ -28,7 +28,7 @@ diagXpX=diag(X'X);                 # Form the elements need for the var(b-hat)
 sigmaSqE=1;                        # In this example we know the residual variance
 burnIn=10;                         # Optionally discard the first few samples
 dfPrior=5;                         # Strength of my prior information
-scaleResVar=(dfPrior-2)*resVar/dfPrior;                # Set my prior
+scaleResVar=resVar*(dfPrior-2)/dfPrior;                # Set my prior
 dfPosterior=nObs+dfPrior;          # Combine the 2 sources of information
 SSprior=dfPrior*scaleResVar
 
@@ -44,7 +44,7 @@ for (iter in 1:niter)
     end  # loop over all the parameters
     SSE=dot(work,work)
     sigmaSqE = (SSE + SSprior)/rand(Chisq(dfPosterior))
-    allSamples[iter,:]= [thisSample, sigmaSqE]                # Store the current samples
+    allSamples[iter,:]= [thisSample; sigmaSqE]                # Store the current samples
     if iter%100 == 0 
         work = y - X*thisSample                               # Avoid rounding errors
     end
